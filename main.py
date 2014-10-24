@@ -1,66 +1,67 @@
-import nltk
-import files
-from collections import Counter
+from index import IndexSource
+from index import Index
+from utils import Timer
+from output import Output
+
+# Index source
+print("Do you want to create a new index or load an stored index?")
+print("[1] Create new index")
+print("[2] Load stored index")
+
+while True:
+    indexOption = input("What's your choice [1/2]: ")
+
+    if indexOption == '1':
+        indexSource = IndexSource.new
+        break
+    elif indexOption == '2':
+        indexSource = IndexSource.stored
+        break
+
+    print("Invalid option '" + indexOption + "', please choose again.")
 
 
-def loadBookText(filename):
-    return open(filename, 'rU').read()
+# Index
+index = Index(indexSource)
+
+timerForIndexCreation = index.getTimer()
+print("Time for creating the index: " + timerForIndexCreation.getElapsedMillisecondsString() + "\n")
 
 
-def getTokenizedList(inputStr):
-    #uses nltk word_tokenizer to gain all tokens, removes punctuation and converts remaining tokens to lower case
-    origTokenList = nltk.word_tokenize(inputStr)
-    # isalpha() - test if s is non-empty and all characters in s are alphabetic
-    modifiedTokenList = [token.lower() for token in origTokenList if token.isalpha()]
-    return modifiedTokenList
+# Query
+print("Query execution:")
+print("You can leave the program by entering 'exit'.\n")
+
+while True:
+    query = input("Query: ")
+
+    if query == "exit":
+        break
+
+    timer = Timer()
+    timer.start()
+
+    # Execution of the query
+
+    timer.stop()
+    print("Execution time: " + timer.getElapsedMillisecondsString() + "\n")
+
+print("Exiting form query execution ...\n")
 
 
-def getNoOfTerms(tokens):
-    return len(tokens)
+# Store index
+print("Do you want to store the index?")
+while True:
+    indexOption = input("[y/n]: ")
 
+    if indexOption == 'y':
+        index.storeIndex()
 
-def getNoOfUniqueTerms(tokens):
-    return len(set(tokens))
+        timerForIndexStoring = index.getTimer()
+        print("Time for storing the index: " + timerForIndexStoring.getElapsedMillisecondsString() + "\n")
 
+        break
+    elif indexOption == 'n':
+        break
 
-def getTermDictionary(tokens):
-    return nltk.FreqDist(tokens)
-
-
-def getNmostFrequentTerms(dictionary, n):
-    #calculates the frequency for all the given tokens and returns the n most common
-    #frequency distribution tells us the frequency of each vocabulary item in the text.
-    return dictionary.most_common(n)
-
-
-def printFrequencyTerms(termList):
-    #prints the list of terms and their according frequency on console
-    for elem in termList:
-        print(elem[0] + "\t\t[ " + str(elem[1]) + " ]")
-
-
-## Main programm
-path = "books/"
-books = files.loadBooksFromFolder(path)
-
-totalTerms = 0
-dictionary = Counter()
-
-for book in books:
-    text = loadBookText(book)
-    text = getTokenizedList(text)
-    print(book)
-    number = getNoOfTerms(text)
-    totalTerms += number
-    print("Total # of terms: " + str(number))
-    print("Total # of unique terms: " + str(getNoOfUniqueTerms(text)))
-    print("50 most frequent terms: ")
-    temp = getTermDictionary(text)
-    printFrequencyTerms(getNmostFrequentTerms(temp, 50))
-    dictionary = dictionary + Counter(temp)
-print("\nTotal number of terms:")
-print(totalTerms)
-print("\nLenght of overall dictionary:")
-print(len(dictionary.keys()))
-print("\n50 most frequent terms in overall dictionary:")
-printFrequencyTerms(getNmostFrequentTerms(dictionary, 50))
+    print("Invalid option '" + indexOption + "', please choose again.")
