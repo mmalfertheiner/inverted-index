@@ -1,6 +1,7 @@
 import pickle
 import os
 
+
 class Storage:
 
     STORAGE_DIRECTORY = "storage/"

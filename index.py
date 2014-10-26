@@ -4,6 +4,7 @@ from parser import Parser
 from documents import DocumentCoordinator
 from storage import Storage
 
+
 class IndexSource(Enum):
     new = 1
     stored = 2
@@ -14,9 +15,11 @@ class Index:
     source = None
     timer = None
     dictionary = None
+    parserType = None
 
-    def __init__(self, source):
+    def __init__(self, source, parserType):
         self.source = source
+        self.parserType = parserType
         self.dictionary = Dictionary()
 
         self.timer = Timer()
@@ -37,10 +40,10 @@ class Index:
 
 
     def createNewIndex(self):
-        docCoordinator = DocumentCoordinator("documents")
+        docCoordinator = DocumentCoordinator("books")
         documents = docCoordinator.loadDocuments()
 
-        parser = Parser()
+        parser = Parser(self.parserType)
 
         for document in documents:
             text = docCoordinator.getDocumentText(document)
@@ -49,6 +52,7 @@ class Index:
             for position, token in enumerate(tokens):
                 postingList = self.dictionary.getPostingsList(token)
                 postingList.addPosting(document, position)
+
 
 
     def loadStoredIndex(self):
@@ -72,6 +76,10 @@ class Index:
 
     def getTimer(self):
         return self.timer
+
+
+    def getParserType(self):
+        return self.parserType
 
 
 class Posting:
@@ -135,6 +143,10 @@ class PostingsList:
         posting = Posting(document)
         posting.addOccurrence(position)
         self.postings.append(posting)
+
+
+    def getSortedPostingsList(self):
+        return sorted(self.postings, key=lambda posting: posting.getDocument().getPath())
 
 
 class Dictionary:

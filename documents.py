@@ -1,5 +1,6 @@
 from os import walk
 
+
 class Document:
 
     path = ""

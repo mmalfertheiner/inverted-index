@@ -1,7 +1,8 @@
 from index import IndexSource
 from index import Index
-from utils import Timer
-from output import Output
+from queryexecutor import QueryExecutor
+from parser import Parser
+from parser import ParserType
 
 # Index source
 print("Do you want to create a new index or load an stored index?")
@@ -22,15 +23,16 @@ while True:
 
 
 # Index
-index = Index(indexSource)
-
-timerForIndexCreation = index.getTimer()
-print("Time for creating the index: " + timerForIndexCreation.getElapsedMillisecondsString() + "\n")
-
+index = Index(indexSource, ParserType.simple)
+print(len(index.getDictionary().getTerms().keys()))
+print("Time for creating the index: " + index.getTimer().getElapsedMillisecondsString() + "\n")
 
 # Query
 print("Query execution:")
 print("You can leave the program by entering 'exit'.\n")
+
+queryParser = Parser(index.getParserType())
+queryExecutor = QueryExecutor(index)
 
 while True:
     query = input("Query: ")
@@ -38,13 +40,15 @@ while True:
     if query == "exit":
         break
 
-    timer = Timer()
-    timer.start()
-
     # Execution of the query
+    parsedQueries = queryParser.parseQuery(query)
+    resultList = queryExecutor.executeQueries(parsedQueries)
+    postinglist = index.getDictionary().getPostingsList("Gutenberg")
 
-    timer.stop()
-    print("Execution time: " + timer.getElapsedMillisecondsString() + "\n")
+    for posting in resultList:
+        print(posting.getDocument().getPath() + "\n")
+
+    print("Execution time: " + queryExecutor.getTimer().getElapsedMillisecondsString() + "\n")
 
 print("Exiting form query execution ...\n")
 
