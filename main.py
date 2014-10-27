@@ -42,11 +42,10 @@ while True:
 
     # Execution of the query
     parsedQueries = queryParser.parseQuery(query)
-    resultList = queryExecutor.executeQueries(parsedQueries)
-    postinglist = index.getDictionary().getPostingsList("Gutenberg")
+    result = queryExecutor.executeQueries(parsedQueries)
 
-    for posting in resultList:
-        print(posting.getDocument().getPath() + "\n")
+    for doc, resultItem in result.getItems().items():
+        print("\t " + doc.getPath())
 
     print("Execution time: " + queryExecutor.getTimer().getElapsedMillisecondsString() + "\n")
 
