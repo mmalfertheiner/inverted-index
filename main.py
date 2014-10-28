@@ -29,7 +29,7 @@ print("Time for creating the index: " + index.getTimer().getElapsedMillisecondsS
 
 # Query
 print("Query execution:")
-print("You can leave the program by entering 'exit'.\n")
+print("You can leave the program by entering 'exit()'.\n")
 
 queryParser = Parser(index.getParserType())
 queryExecutor = QueryExecutor(index)
@@ -37,15 +37,15 @@ queryExecutor = QueryExecutor(index)
 while True:
     query = input("Query: ")
 
-    if query == "exit":
+    if query == "exit()":
         break
 
     # Execution of the query
     parsedQueries = queryParser.parseQuery(query)
     result = queryExecutor.executeQueries(parsedQueries)
 
-    for doc, resultItem in result.getItems().items():
-        print("\t " + doc.getPath())
+    for item in result:
+        print("\t " + item.getDocument().getPath() + ": " + str(item.getRank()))
 
     print("Execution time: " + queryExecutor.getTimer().getElapsedMillisecondsString() + "\n")
 

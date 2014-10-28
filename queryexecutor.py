@@ -1,5 +1,8 @@
 from utils import Timer
 from query import QueryResult
+from ranking import RankProvider
+from ranking import RankedResult
+from ranking import RankedResultItem
 
 class QueryExecutor:
 
@@ -15,7 +18,7 @@ class QueryExecutor:
         self.timer.start()
 
         queryMatchingList = []
-        queryMatching = None
+        executedTokens = 0
 
         for query in queryList:
             searchTokens = query.getSearchTokens()
@@ -23,12 +26,13 @@ class QueryExecutor:
 
             searchResult = QueryResult()
             for token in searchTokens:
-                tmpPostingsList = self.getPostingsList(token)
+                executedTokens += 1
+                tmpPostingsList = self.index.getDictionary().getPostingsList(token)
                 searchResult.addPostingList(token, tmpPostingsList)
 
             excludedResult = QueryResult()
             for token in excludedTokens:
-                tmpPostingsList = self.getPostingsList(token)
+                tmpPostingsList = self.index.getDictionary().getPostingsList(token)
                 excludedResult.addPostingList(token, tmpPostingsList)
 
             if(len(excludedResult.getItems()) > 0):
@@ -40,14 +44,15 @@ class QueryExecutor:
 
         queryMatching = QueryResult.mergeWithIntersection(queryMatchingList)
 
-        #TODO: Make sort algorithm
+        rankedResult = RankedResult()
+        for doc, queryResultItem in queryMatching.getItems().items():
+            rank = RankProvider.provideRank(queryResultItem, executedTokens)
+            rankedResultItem = RankedResultItem(doc, rank, queryResultItem)
+            rankedResult.addRankedResultItem(rankedResultItem)
+
         self.timer.stop()
 
-        return queryMatching
-
-
-    def getPostingsList(self, token):
-        return self.index.getDictionary().getPostingsList(token)
+        return rankedResult.getSortedResult()
 
 
     def getTimer(self):

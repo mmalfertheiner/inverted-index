@@ -110,14 +110,3 @@ class QueryResult:
                 queryResult.addResultItem(doc, finalQueryResultItem)
 
         return queryResult
-
-
-
-class RankedResult:
-
-    matches = None
-
-    def __init__(self):
-        self.matches = []
-
-    def addMatch
