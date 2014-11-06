@@ -23,7 +23,7 @@ while True:
 
 
 # Index
-index = Index(indexSource, ParserType.simple)
+index = Index(indexSource, ParserType.wordprocessing)
 print(len(index.getDictionary().getTerms().keys()))
 print("Time for creating the index: " + index.getTimer().getElapsedMillisecondsString() + "\n")
 

@@ -30,7 +30,7 @@ class Parser:
         tokenList = nltk.word_tokenize(text)
 
         if self.type == ParserType.wordprocessing:
-            parsedTokenList = [self.applyTextProcessing(token.lower()) for token in tokenList if token.isalpha()]
+            parsedTokenList = [self.applyTextProcessing(token.lower()) for token in tokenList if (token.isalpha()) and (not token.lower() in self.stopWords)]
         else:
             parsedTokenList = [token.lower() for token in tokenList if token.isalpha()]
 
